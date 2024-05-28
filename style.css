@@ -36,13 +36,6 @@ body{
     color: yellowgreen;
     cursor: pointer;
 }
-/* .chocolate{
-    width: 40px;
-    position: absolute;
-    top: 9rem;
-    right: 0;
-    opacity: .5;
-} */
 .home-body{
     display: flex;
     justify-content: center;
@@ -68,6 +61,17 @@ body{
 }
 .home-body-text p{
     font-size: 15px;
+}
+.slider{
+    padding-top: 50px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+.slider img{
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
 }
 form {
     display: none; 
@@ -116,7 +120,20 @@ form button[type="submit"]:hover {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     z-index: 1000;
 }
-
+.form-popup #flavour{
+    font-style: italic;
+}
+.form-popup #snack-name, .form-popup #price{
+    font: bold;
+}
+.form-popup #submitBtn{
+    width: 50px;
+    height: 30px;
+    background-color: darkcyan;
+    color: white;
+    border-radius: 10px;
+    border: none;
+}
 /* Form background overlay */
 .form-overlay {
     display: none;
