@@ -36,6 +36,11 @@ body{
     color: yellowgreen;
     cursor: pointer;
 }
+.navigation #user-role{
+    margin-top: 10px;
+    padding: 10px 10px;
+    border-radius: 5px;
+}
 .home-body{
     display: flex;
     justify-content: center;

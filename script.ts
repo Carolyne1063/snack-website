@@ -3,30 +3,33 @@ class SnackCentre {
     private form: HTMLFormElement;
     private productsList: HTMLDivElement;
     private currentSnackCard: HTMLDivElement | null = null;
+    private userRoleSelect: HTMLSelectElement;
+    private addButton: HTMLButtonElement;
 
     constructor() {
-        this.formButton = document.querySelector('button')!;
+        this.formButton = document.querySelector('.add-button')!;
         this.form = document.querySelector('form')!;
         this.productsList = document.querySelector('.products-list')!;
+        this.userRoleSelect = document.getElementById('user-role') as HTMLSelectElement;
+        this.addButton = document.querySelector('.add-button') as HTMLButtonElement;
 
-        this.initialize();
+        this.setup();
     }
 
-    private initialize(): void {
-        this.formButton.addEventListener('click', () => this.toggleForm());
-        this.form.addEventListener('submit', (event) => this.addOrUpdateProduct(event));
+    private setup(): void {
+        this.formButton.addEventListener('click', () => this.showForm());
+        this.form.addEventListener('submit', (event) => this.saveProduct(event));
+        this.userRoleSelect.addEventListener('change', () => this.updateUserRole());
+        this.updateUserRole(); 
     }
 
-    private toggleForm(): void {
-        const isFormVisible = this.form.style.display === 'block';
-        this.form.style.display = isFormVisible ? 'none' : 'block';
-        if (!isFormVisible) {
-            this.form.reset();
-            this.currentSnackCard = null;
-        }
+    private showForm(): void {
+        this.form.style.display = 'block';
+        this.form.reset();
+        this.currentSnackCard = null;
     }
 
-    private addOrUpdateProduct(event: Event): void {
+    private saveProduct(event: Event): void {
         event.preventDefault();
 
         const snackNameInput = document.getElementById('snack-name') as HTMLInputElement;
@@ -41,18 +44,18 @@ class SnackCentre {
 
         if (snackName && flavour && price && imageUrl) {
             if (this.currentSnackCard) {
-                this.updateSnackCard(this.currentSnackCard, snackName, flavour, price, imageUrl);
+                this.updateCard(this.currentSnackCard, snackName, flavour, price, imageUrl);
             } else {
-                const snackCard = this.createSnackCard(snackName, flavour, price, imageUrl);
+                const snackCard = this.createCard(snackName, flavour, price, imageUrl);
                 this.productsList.appendChild(snackCard);
             }
 
             this.form.reset();
-            this.toggleForm();
+            this.form.style.display = 'none';
         }
     }
 
-    private createSnackCard(snackName: string, flavour: string, price: string, imageUrl: string): HTMLDivElement {
+    private createCard(snackName: string, flavour: string, price: string, imageUrl: string): HTMLDivElement {
         const snackCard = document.createElement('div');
         snackCard.classList.add('snack-card');
 
@@ -69,30 +72,24 @@ class SnackCentre {
         pricePara.textContent = `Ksh.${price}`;
 
         const updateButton = document.createElement('button');
-    updateButton.textContent = 'Update';
-    updateButton.classList.add('update');
-    updateButton.addEventListener('click', () => this.populateFormForUpdate(snackCard));
+        updateButton.textContent = 'Update';
+        updateButton.addEventListener('click', () => this.fillForm(snackCard));
 
-    const deleteButton = document.createElement('button');
-    deleteButton.textContent = 'Delete';
-    deleteButton.classList.add('delete');
-    deleteButton.addEventListener('click', () => this.deleteSnackCard(snackCard));
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.addEventListener('click', () => this.removeCard(snackCard));
 
-    const buttonGroup = document.createElement('div');
-    buttonGroup.classList.add('button-group');
-    buttonGroup.appendChild(updateButton);
-    buttonGroup.appendChild(deleteButton);
+        snackCard.appendChild(img);
+        snackCard.appendChild(namePara);
+        snackCard.appendChild(flavourPara);
+        snackCard.appendChild(pricePara);
+        snackCard.appendChild(updateButton);
+        snackCard.appendChild(deleteButton);
 
-    snackCard.appendChild(img);
-    snackCard.appendChild(namePara);
-    snackCard.appendChild(flavourPara);
-    snackCard.appendChild(pricePara);
-    snackCard.appendChild(buttonGroup);
+        return snackCard;
+    }
 
-    return snackCard;
-}
-
-    private updateSnackCard(snackCard: HTMLDivElement, snackName: string, flavour: string, price: string, imageUrl: string): void {
+    private updateCard(snackCard: HTMLDivElement, snackName: string, flavour: string, price: string, imageUrl: string): void {
         const img = snackCard.querySelector('img')!;
         const namePara = snackCard.querySelector('p:nth-of-type(1)')!;
         const flavourPara = snackCard.querySelector('p:nth-of-type(2)')!;
@@ -106,11 +103,11 @@ class SnackCentre {
         this.currentSnackCard = null;
     }
 
-    private deleteSnackCard(snackCard: HTMLDivElement): void {
+    private removeCard(snackCard: HTMLDivElement): void {
         this.productsList.removeChild(snackCard);
     }
 
-    private populateFormForUpdate(snackCard: HTMLDivElement): void {
+    private fillForm(snackCard: HTMLDivElement): void {
         const img = snackCard.querySelector('img')!;
         const namePara = snackCard.querySelector('p:nth-of-type(1)')!;
         const flavourPara = snackCard.querySelector('p:nth-of-type(2)')!;
@@ -128,6 +125,14 @@ class SnackCentre {
 
         this.currentSnackCard = snackCard;
         this.form.style.display = 'block';
+    }
+
+    private updateUserRole(): void {
+        const userRole = this.userRoleSelect.value;
+        const isAdmin = userRole === 'admin';
+
+        this.addButton.style.display = isAdmin ? 'block' : 'none';
+        this.form.style.display = isAdmin && this.currentSnackCard ? 'block' : 'none';
     }
 }
 
