@@ -3,6 +3,7 @@
     padding: 0;
 }
 body{
+    width: 100vw;
     background-color: aliceblue;
     overflow-x: hidden;
 }
@@ -17,16 +18,22 @@ body{
     background-position: center;
     color: white;
     height:100vh;
+    width: 100vw;
 }
 .navigation{
     display: flex;
-    gap: 50px;
+    justify-content:space-around;
     margin-bottom: 100px;
 }
 .navigation h1{
     text-shadow: var(--shadow-text);
     margin-left: 10px;
-    margin-right: 500px;
+    /* margin-right: 500px; */
+}
+.links{
+    display: flex;
+    gap: 20px;
+    align-items: center;
 }
 .navigation p{
     margin-top: 12px;
@@ -70,6 +77,7 @@ body{
 .slider{
     padding-top: 50px;
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     gap: 20px;
 }
@@ -155,6 +163,7 @@ form button[type="submit"]:hover {
     background-color:darkcyan;
     color: white;
     height:100vh;
+    width: 100vw;
 }
 .products p{
     text-align: center;
@@ -249,6 +258,7 @@ form button[type="submit"]:hover {
 }
 .contact-us{
     background-color:rgb(3, 78, 91);
+    width: 100vw;
 }
 .get-in-touch{
     padding: 20px 20px;
@@ -268,4 +278,28 @@ form button[type="submit"]:hover {
     width: 50px;
     height: 20px;
     fill: rgb(64, 146, 212);
+}
+
+@media screen and (max-width : 678px){
+    body{
+        overflow-x: hidden;
+    }
+    .home-page{
+        width: 100%;
+    }
+    .navigation > p{
+        color: #000;
+    }
+    .products{
+        width: 100%;
+    }
+    .contact-us{
+        width: 100%;
+    }
+    .footer p{
+        margin-right: 0;
+    }
+    .get-in-touch, .footer{
+        padding: 5px;
+    }
 }
