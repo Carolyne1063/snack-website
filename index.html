@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,16 +9,17 @@
         @import url(style.css);
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="home-page">
             <div class="navigation">
                 <h1>Snacks Centre</h1>
                 <div class="links">
-                <p>Home</p>
-                <p>Products</p>
-                <p>Contact Us</p>
-            </div>
+                    <p>Home</p>
+                    <p>Products</p>
+                    <p>Contact Us</p>
+                </div>
                 <select id="user-role">
                     <option value="admin">Admin</option>
                     <option value="user">User</option>
@@ -40,7 +42,13 @@
         </div>
         <div class="products">
             <p>Discover a world of flavours</p>
-            <button class="add-button">+</button>
+            <div class="buttons">
+                <button class="add-button">+</button>
+                <select id="view-one-select">
+                    <option value="">View All</option>
+                </select>
+            </div>
+
             <form class="form-popup">
                 <label for="">Snack-name</label>
                 <br>
@@ -61,7 +69,7 @@
                 <input type="submit" id="submitBtn">
             </form>
             <div class="products-list">
-                
+
             </div>
         </div>
         <div class="contact-us">
@@ -83,4 +91,5 @@
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </body>
+
 </html>

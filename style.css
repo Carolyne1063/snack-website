@@ -84,6 +84,12 @@ body{
     height: 150px;
     border-radius: 50%;
 }
+.buttons{
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    padding: 10px;
+}
 form {
     display: none; 
     background-color: #f9f9f9;

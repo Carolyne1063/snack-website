@@ -6,6 +6,8 @@ class SnackCentre {
     private userRoleSelect: HTMLSelectElement;
     private addButton: HTMLButtonElement;
     private userRole: string;
+    private viewOneSelect: HTMLSelectElement;
+    private allProducts: { id: string, snackName: string, flavour: string, price: string, imageUrl: string }[] = [];
 
     constructor() {
         this.formButton = document.querySelector('.add-button')!;
@@ -13,6 +15,7 @@ class SnackCentre {
         this.productsList = document.querySelector('.products-list')!;
         this.userRoleSelect = document.getElementById('user-role') as HTMLSelectElement;
         this.addButton = document.querySelector('.add-button') as HTMLButtonElement;
+        this.viewOneSelect = document.getElementById('view-one-select') as HTMLSelectElement;
         this.userRole = this.userRoleSelect.value;
 
         this.setup();
@@ -23,6 +26,7 @@ class SnackCentre {
         this.formButton.addEventListener('click', () => this.showForm());
         this.form.addEventListener('submit', (event) => this.saveProduct(event));
         this.userRoleSelect.addEventListener('change', () => this.updateUserRole());
+        this.viewOneSelect.addEventListener('change', () => this.filterProducts());
         this.updateUserRole(); 
     }
 
@@ -55,6 +59,8 @@ class SnackCentre {
                 const createdProduct = await this.saveProductToAPI(product);
                 const snackCard = this.createCard(createdProduct.id, snackName, flavour, price, imageUrl);
                 this.productsList.appendChild(snackCard);
+                this.allProducts.push({ id: createdProduct.id, snackName, flavour, price, imageUrl });
+                this.updateViewOneSelect();
             }
 
             this.form.reset();
@@ -117,6 +123,8 @@ class SnackCentre {
     private async removeCard(snackCard: HTMLDivElement): Promise<void> {
         await this.deleteProductFromAPI(snackCard.dataset.id!);
         this.productsList.removeChild(snackCard);
+        this.allProducts = this.allProducts.filter(product => product.id !== snackCard.dataset.id);
+        this.updateViewOneSelect();
     }
 
     private fillForm(snackCard: HTMLDivElement): void {
@@ -189,12 +197,41 @@ class SnackCentre {
     private async loadProductsFromAPI(): Promise<void> {
         const response = await fetch('http://localhost:3000/products');
         const products = await response.json();
+        this.allProducts = products;
 
         products.forEach((product: { id: string, snackName: string, flavour: string, price: string, imageUrl: string }) => {
             const snackCard = this.createCard(product.id, product.snackName, product.flavour, product.price, product.imageUrl);
             this.productsList.appendChild(snackCard);
         });
+
+        this.updateViewOneSelect();
     }
+
+    private updateViewOneSelect(): void {
+        this.viewOneSelect.innerHTML = '<option value="">View All</option>';
+        this.allProducts.forEach(product => {
+            const option = document.createElement('option');
+            option.value = product.snackName;
+            option.textContent = product.snackName;
+            this.viewOneSelect.appendChild(option);
+        });
+    }
+
+    private filterProducts(): void {
+        const selectedProductName = this.viewOneSelect.value;
+        const snackCards = this.productsList.querySelectorAll('.snack-card');
+    
+        snackCards.forEach(snackCard => {
+            const card = snackCard as HTMLDivElement;
+            const namePara = card.querySelector('p:nth-of-type(1)')!;
+            if (selectedProductName === '' || namePara.textContent === selectedProductName) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+    
 }
 
 document.addEventListener('DOMContentLoaded', () => {
