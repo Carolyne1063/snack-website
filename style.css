@@ -64,8 +64,6 @@ body{
     height: 400px;
 }
 .home-body-text h1{
-    /* font: var(--font-regular) var(--biggest-font-size) var(--second-font);
-    line-height: 100%; */
     font-size: 50px;
     font-weight: 600;
     margin-bottom: 1rem;
@@ -126,7 +124,7 @@ form button[type="submit"]:hover {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 300px; /* Adjust as needed */
+    width: 300px; 
     padding: 20px;
     background-color: white;
     color: black;
@@ -147,7 +145,6 @@ form button[type="submit"]:hover {
     border-radius: 10px;
     border: none;
 }
-/* Form background overlay */
 .form-overlay {
     display: none;
     position: fixed;
@@ -162,7 +159,7 @@ form button[type="submit"]:hover {
 .products{
     background-color:darkcyan;
     color: white;
-    height:100vh;
+    height:100%;
     width: 100vw;
 }
 .products p{
@@ -182,13 +179,15 @@ form button[type="submit"]:hover {
 
 }
 .products-list{
-    padding-top: 20px;
+    padding: 40px;
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
-    gap: 20px;
+    gap: 40px;
     width: 100%;
-    height: 66%;
-    /* background-color:  ; */
+    height: 100%;
+    
+    
 }
 .snack-card{
     display: flex;
@@ -231,21 +230,10 @@ form button[type="submit"]:hover {
     cursor: pointer;
     font-size: 14px;
 }
-/* .snack-card button.update {
-    background-color: #4CAF50;
-    color: white;
-} */
-
 .snack-card button.update:hover {
     background-color: darkcyan;
     color: white;
 }
-
-/* .snack-card button.delete {
-    background-color: #f44336;
-    color: white;
-} */
-
 .snack-card button.delete:hover {
     background-color: darkcyan;
     color: white;
@@ -259,6 +247,7 @@ form button[type="submit"]:hover {
 .contact-us{
     background-color:rgb(3, 78, 91);
     width: 100vw;
+    color: white;
 }
 .get-in-touch{
     padding: 20px 20px;
@@ -301,5 +290,25 @@ form button[type="submit"]:hover {
     }
     .get-in-touch, .footer{
         padding: 5px;
+    }
+}
+
+@media screen and (max-width: 1200px){
+    body{
+        overflow-x: hidden;
+    }
+    .products-list{
+        width: 90%;
+    }
+    
+}
+
+@media screen and (max-width: 2000px){
+    body{
+        overflow-x: hidden;
+    }
+    .products-list{
+        display: flex;
+        flex-wrap: wrap;
     }
 }
