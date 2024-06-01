@@ -150,6 +150,7 @@ class SnackCentre {
     private updateUserRole(): void {
         this.userRole = this.userRoleSelect.value;
         const isAdmin = this.userRole === 'admin';
+        const isUser = this.userRole === 'user';
 
         this.addButton.style.display = isAdmin ? 'block' : 'none';
         this.form.style.display = isAdmin && this.currentSnackCard ? 'block' : 'none';
@@ -158,10 +159,27 @@ class SnackCentre {
         snackCards.forEach(snackCard => {
             const updateButton = snackCard.querySelector('button:nth-of-type(1)') as HTMLButtonElement;
             const deleteButton = snackCard.querySelector('button:nth-of-type(2)') as HTMLButtonElement;
+            const cartBtn = document.createElement('button') as HTMLButtonElement;
+            cartBtn.textContent='Add To Cart';
+            snackCard.appendChild(cartBtn);
 
             if (updateButton && deleteButton) {
-                updateButton.style.display = isAdmin ? 'inline-block' : 'none';
-                deleteButton.style.display = isAdmin ? 'inline-block' : 'none';
+                if(isAdmin){
+                    updateButton.style.display='block';
+                    deleteButton.style.display='block';
+                    cartBtn.style.display= 'none';
+
+                }
+                else if(isUser){
+                    updateButton.style.display='none';
+                    deleteButton.style.display='none';
+                    cartBtn.style.display= 'block';
+
+
+                   
+                }
+                // updateButton.style.display = isAdmin ? 'inline-block' :isUser? 'none';
+                // deleteButton.style.display = isAdmin ? 'inline-block' : 'none';
             }
         });
     }

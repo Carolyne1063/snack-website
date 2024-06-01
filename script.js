@@ -123,15 +123,29 @@ class SnackCentre {
     updateUserRole() {
         this.userRole = this.userRoleSelect.value;
         const isAdmin = this.userRole === 'admin';
+        const isUser = this.userRole === 'user';
         this.addButton.style.display = isAdmin ? 'block' : 'none';
         this.form.style.display = isAdmin && this.currentSnackCard ? 'block' : 'none';
         const snackCards = this.productsList.querySelectorAll('.snack-card');
         snackCards.forEach(snackCard => {
             const updateButton = snackCard.querySelector('button:nth-of-type(1)');
             const deleteButton = snackCard.querySelector('button:nth-of-type(2)');
+            const cartBtn = document.createElement('button');
+            cartBtn.textContent = 'Add To Cart';
+            snackCard.appendChild(cartBtn);
             if (updateButton && deleteButton) {
-                updateButton.style.display = isAdmin ? 'inline-block' : 'none';
-                deleteButton.style.display = isAdmin ? 'inline-block' : 'none';
+                if (isAdmin) {
+                    updateButton.style.display = 'block';
+                    deleteButton.style.display = 'block';
+                    cartBtn.style.display = 'none';
+                }
+                else if (isUser) {
+                    updateButton.style.display = 'none';
+                    deleteButton.style.display = 'none';
+                    cartBtn.style.display = 'block';
+                }
+                // updateButton.style.display = isAdmin ? 'inline-block' :isUser? 'none';
+                // deleteButton.style.display = isAdmin ? 'inline-block' : 'none';
             }
         });
     }
