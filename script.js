@@ -136,73 +136,34 @@ class SnackCentre {
         snackCards.forEach(snackCard => {
             const updateButton = snackCard.querySelector('button:nth-of-type(1)');
             const deleteButton = snackCard.querySelector('button:nth-of-type(2)');
-            const cartBtn = document.createElement('button');
-            cartBtn.textContent = 'Add To Cart';
-            snackCard.appendChild(cartBtn);
             if (updateButton && deleteButton) {
                 if (isAdmin) {
                     updateButton.style.display = 'block';
                     deleteButton.style.display = 'block';
-                    cartBtn.style.display = 'none';
                 }
                 else if (isUser) {
                     updateButton.style.display = 'none';
                     deleteButton.style.display = 'none';
+                    const cartBtn = document.createElement('button');
+                    cartBtn.textContent = 'Add To Cart';
                     cartBtn.style.display = 'block';
-                    const self = this;
-                    cartBtn.addEventListener('click', function () {
-                        self.addToCart(snackCard);
-                    });
+                    cartBtn.addEventListener('click', () => this.addToCart(snackCard));
+                    snackCard.appendChild(cartBtn);
                 }
             }
         });
     }
-    async addToCart(snackCard) {
+    addToCart(snackCard) {
         const id = snackCard.dataset.id;
         const img = snackCard.querySelector('img').src;
         const name = snackCard.querySelector('p:nth-of-type(1)').textContent;
         const flavour = snackCard.querySelector('p:nth-of-type(2)').textContent;
         const price = snackCard.querySelector('p:nth-of-type(3)').textContent.replace('Ksh.', '');
         const cartItem = { id, img, name, flavour, price };
-        await fetch('http://localhost:3000/cart', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(cartItem),
-        });
+        let cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]');
+        cartItems.push(cartItem);
+        localStorage.setItem('cartItems', JSON.stringify(cartItems));
         alert(`${name} added to cart.`);
-        // Add the product to the cart card holder
-        const cartItemsContainer = document.getElementById('cart-items-container');
-        const cartCard = this.createCartCard(cartItem);
-        cartItemsContainer.appendChild(cartCard);
-    }
-    createCartCard(cartItem) {
-        const cartCard = document.createElement('div');
-        cartCard.classList.add('cart-card');
-        const img = document.createElement('img');
-        img.src = cartItem.img;
-        cartCard.appendChild(img);
-        const namePara = document.createElement('p');
-        namePara.textContent = cartItem.name;
-        cartCard.appendChild(namePara);
-        const flavourPara = document.createElement('p');
-        flavourPara.textContent = cartItem.flavour;
-        cartCard.appendChild(flavourPara);
-        const pricePara = document.createElement('p');
-        pricePara.textContent = `Ksh.${cartItem.price}`;
-        cartCard.appendChild(pricePara);
-        const removeButton = document.createElement('button');
-        removeButton.textContent = 'Remove';
-        removeButton.addEventListener('click', () => this.removeFromCart(cartCard));
-        cartCard.appendChild(removeButton);
-        return cartCard;
-    }
-    async removeFromCart(cartCard) {
-        const id = cartCard.dataset.id;
-        // Implement removal from the cart API endpoint
-        // Remove the card from the cart card holder
-        cartCard.remove();
     }
     async saveProductToAPI(product) {
         const response = await fetch('http://localhost:3000/products', {
@@ -231,41 +192,40 @@ class SnackCentre {
     async loadProductsFromAPI() {
         const response = await fetch('http://localhost:3000/products');
         const products = await response.json();
-        this.productsList.innerHTML = '';
+        this.allProducts = products;
         products.forEach((product) => {
             const snackCard = this.createCard(product.id, product.snackName, product.flavour, product.price, product.imageUrl);
             this.productsList.appendChild(snackCard);
-            this.allProducts.push(product);
         });
         this.updateViewOneSelect();
     }
-    updateViewOneSelect() {
-        const uniqueSnackNames = Array.from(new Set(this.allProducts.map(product => product.snackName)));
-        this.viewOneSelect.innerHTML = '<option value="">--Select Snack Name--</option>';
-        uniqueSnackNames.forEach(snackName => {
-            const option = document.createElement('option');
-            option.value = snackName;
-            option.textContent = snackName;
-            this.viewOneSelect.appendChild(option);
-        });
-    }
     filterProducts() {
-        const selectedSnackName = this.viewOneSelect.value;
-        if (selectedSnackName) {
-            const filteredProducts = this.allProducts.filter(product => product.snackName === selectedSnackName);
-            this.productsList.innerHTML = '';
-            filteredProducts.forEach(product => {
-                const snackCard = this.createCard(product.id, product.snackName, product.flavour, product.price, product.imageUrl);
-                this.productsList.appendChild(snackCard);
-            });
+        const selectedProductId = this.viewOneSelect.value;
+        if (selectedProductId === 'default') {
+            this.showAllProducts();
         }
         else {
-            this.productsList.innerHTML = '';
-            this.allProducts.forEach(product => {
-                const snackCard = this.createCard(product.id, product.snackName, product.flavour, product.price, product.imageUrl);
-                this.productsList.appendChild(snackCard);
-            });
+            this.showSelectedProduct(selectedProductId);
         }
+    }
+    showAllProducts() {
+        this.productsList.querySelectorAll('.snack-card').forEach(card => {
+            card.style.display = 'block';
+        });
+    }
+    showSelectedProduct(selectedProductId) {
+        this.productsList.querySelectorAll('.snack-card').forEach(card => {
+            card.style.display = card.dataset.id === selectedProductId ? 'block' : 'none';
+        });
+    }
+    updateViewOneSelect() {
+        this.viewOneSelect.innerHTML = '<option value="default">Select a snack...</option>';
+        this.allProducts.forEach(product => {
+            const option = document.createElement('option');
+            option.value = product.id;
+            option.textContent = product.snackName;
+            this.viewOneSelect.appendChild(option);
+        });
     }
 }
 document.addEventListener('DOMContentLoaded', () => {
@@ -277,5 +237,49 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     mainDashboardButton.addEventListener('click', () => {
         window.location.href = 'index.html';
+    });
+    // Load cart items from local storage and display them in the cart
+    const cartItemsContainer = document.getElementById('cart-items-container');
+    const cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]');
+    cartItems.forEach((cartItem) => {
+        const cartCard = createCartCard(cartItem);
+        cartItemsContainer.appendChild(cartCard);
+    });
+    // Create a cart card element
+    function createCartCard(cartItem) {
+        const cartCard = document.createElement('div');
+        cartCard.classList.add('cart-card');
+        cartCard.dataset.id = cartItem.id;
+        const img = document.createElement('img');
+        img.src = cartItem.img;
+        cartCard.appendChild(img);
+        const namePara = document.createElement('p');
+        namePara.textContent = cartItem.name;
+        cartCard.appendChild(namePara);
+        const flavourPara = document.createElement('p');
+        flavourPara.textContent = cartItem.flavour;
+        cartCard.appendChild(flavourPara);
+        const pricePara = document.createElement('p');
+        pricePara.textContent = `Ksh.${cartItem.price}`;
+        cartCard.appendChild(pricePara);
+        const removeButton = document.createElement('button');
+        removeButton.textContent = 'Remove';
+        removeButton.addEventListener('click', () => removeFromCart(cartCard));
+        cartCard.appendChild(removeButton);
+        return cartCard;
+    }
+    // Remove cart item from local storage and from the cart UI
+    function removeFromCart(cartCard) {
+        const id = cartCard.dataset.id;
+        let cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]');
+        cartItems = cartItems.filter((item) => item.id !== id);
+        localStorage.setItem('cartItems', JSON.stringify(cartItems));
+        cartCard.remove();
+    }
+    // Remove all items from the cart
+    const removeAllButton = document.getElementById('remove-all-button');
+    removeAllButton.addEventListener('click', () => {
+        localStorage.removeItem('cartItems');
+        cartItemsContainer.innerHTML = '';
     });
 });

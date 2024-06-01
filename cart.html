@@ -3,29 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Cart</title>
+    <title>Snack Centre</title>
     <style>
         @import url(styles.css);
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="navigation">
-            <ion-icon name="cart-outline"></ion-icon>
-            <h1>Your Cart</h1>
-            <button id="main-dashboard-button">Main Dashboard</button>
-        </div>
-        <div class="the-cart">
-            <div class="remove-all">
-                <p id="remove-all-button">Remove all</p>
-            </v>
-            <div class="cart-items-holder" id="cart-items-container">
-                <!-- Cart items will be injected here as cards -->
-            </div>
-        </div>
+    <div class="navigation">
+        <ion-icon name="cart-outline"></ion-icon>
     </div>
+    <div class="buttons">
+        <button id="main-dashboard-button">Main Dashboard</button>
+    <button id="remove-all-button">Remove All Items</button>
+    </div>
+    <div>
+        <!-- <label for="user-role">User Role:</label> -->
+        <select id="user-role">
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+        </select>
+    </div>
+    <div>
+        <!-- <label for="view-one-select">View one snack:</label> -->
+        <select id="view-one-select">
+            <option value="default">Select a snack...</option>
+        </select>
+    </div>
+    <button class="add-button">Add New Snack</button>
+    <form style="display: none;">
+        <input type="text" id="snack-name" placeholder="Snack Name" required>
+        <input type="text" id="flavour" placeholder="Flavour" required>
+        <input type="text" id="price" placeholder="Price" required>
+        <input type="url" id="image-url" placeholder="Image URL" required>
+        <button type="submit">Save</button>
+    </form>
+    <div class="products-list"></div>
+    <div id="cart-items-container"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <script src="script.js"></script>
-    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </body>
 </html>

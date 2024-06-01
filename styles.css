@@ -17,28 +17,62 @@ body{
     width: 70px;
     height: 50px;
 }
-.navigation button{
+
+.buttons{
+    display:flex;
+    justify-content: center;
+    gap: 100px;
+    padding: 30px;
+
+}
+.buttons #main-dashboard-button{
     background-color: white;
     color: black;
     border-radius: 5px;
     padding: 5px;
 }
-.the-cart{
+.buttons #remove-all-button{
+    padding: 5px;
+    color: red;
+    font-size: 20px;
+    border: 5px solid cadetblue;
+    border-radius: 5px;
+    background-color: aliceblue;
+}
+/* .the-cart{
     background-color: white;
     display: flex;
     justify-content: center;
+} */
+#cart-items-container, .products-list{
+    background: linear-gradient(darkcyan, rgb(3, 78, 91));
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+.cartCard{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(darkcyan, rgb(3, 78, 91));
+    color: white;
+    width: 250px;
+    height: 250px;
+    border: 1px solid gray;
+    border-radius: 20px;
+    box-shadow: 0 4px 8px gray;
+
 }
 /* .remove-all{
     display: flex;
     text-align: end;
 } */
-.remove-all p{
-    color: red;
-    font-size: 25px;
-}
+
 .cart-items-holder{
     margin-top: 70px;
     box-shadow: 3px solid cadetblue;
+    height: 100vh;
 }
 table {
     font-family: arial, sans-serif;
@@ -56,4 +90,36 @@ table {
   tr:nth-child(even) {
     background-color: #dddddd;
   }
+  /* styles.css */
+
+/* Hide the user role select option */
+#user-role {
+    display: none;
+}
+
+/* Hide the view one select option */
+#view-one-select {
+    display: none;
+}
+
+/* Hide the form initially */
+form {
+    display: none;
+}
+
+/* Display the form for admin users */
+#user-role[value="admin"] ~ .add-button {
+    display: block;
+}
+
+/* Display the view one select option for admin users */
+#user-role[value="admin"] ~ div:nth-child(5) {
+    display: block;
+}
+
+/* Display the form when user role is admin and there is a current snack card */
+#user-role[value="admin"] ~ form {
+    display: block;
+}
+
 
