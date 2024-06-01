@@ -27,7 +27,7 @@ class SnackCentre {
         this.form.addEventListener('submit', (event) => this.saveProduct(event));
         this.userRoleSelect.addEventListener('change', () => this.updateUserRole());
         this.viewOneSelect.addEventListener('change', () => this.filterProducts());
-        this.updateUserRole(); 
+        this.updateUserRole();
     }
 
     private showForm(): void {
@@ -101,6 +101,11 @@ class SnackCentre {
 
             snackCard.appendChild(updateButton);
             snackCard.appendChild(deleteButton);
+        } else {
+            const cartBtn = document.createElement('button');
+            cartBtn.textContent = 'Add To Cart';
+            cartBtn.addEventListener('click', () => this.addToCart(snackCard));
+            snackCard.appendChild(cartBtn);
         }
 
         return snackCard;
@@ -160,28 +165,86 @@ class SnackCentre {
             const updateButton = snackCard.querySelector('button:nth-of-type(1)') as HTMLButtonElement;
             const deleteButton = snackCard.querySelector('button:nth-of-type(2)') as HTMLButtonElement;
             const cartBtn = document.createElement('button') as HTMLButtonElement;
-            cartBtn.textContent='Add To Cart';
+            cartBtn.textContent = 'Add To Cart';
             snackCard.appendChild(cartBtn);
 
             if (updateButton && deleteButton) {
-                if(isAdmin){
-                    updateButton.style.display='block';
-                    deleteButton.style.display='block';
-                    cartBtn.style.display= 'none';
+                if (isAdmin) {
+                    updateButton.style.display = 'block';
+                    deleteButton.style.display = 'block';
+                    cartBtn.style.display = 'none';
+                } else if (isUser) {
+                    updateButton.style.display = 'none';
+                    deleteButton.style.display = 'none';
+                    cartBtn.style.display = 'block';
 
+                    const self = this;
+                    cartBtn.addEventListener('click', function () {
+                        self.addToCart(snackCard as HTMLDivElement);
+                    });
                 }
-                else if(isUser){
-                    updateButton.style.display='none';
-                    deleteButton.style.display='none';
-                    cartBtn.style.display= 'block';
-
-
-                   
-                }
-                // updateButton.style.display = isAdmin ? 'inline-block' :isUser? 'none';
-                // deleteButton.style.display = isAdmin ? 'inline-block' : 'none';
             }
         });
+    }
+
+    private async addToCart(snackCard: HTMLDivElement): Promise<void> {
+        const id = snackCard.dataset.id!;
+        const img = snackCard.querySelector('img')!.src;
+        const name = snackCard.querySelector('p:nth-of-type(1)')!.textContent!;
+        const flavour = snackCard.querySelector('p:nth-of-type(2)')!.textContent!;
+        const price = snackCard.querySelector('p:nth-of-type(3)')!.textContent!.replace('Ksh.', '');
+
+        const cartItem = { id, img, name, flavour, price };
+
+        await fetch('http://localhost:3000/cart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(cartItem),
+        });
+
+        alert(`${name} added to cart.`);
+
+        // Add the product to the cart card holder
+        const cartItemsContainer = document.getElementById('cart-items-container')!;
+        const cartCard = this.createCartCard(cartItem);
+        cartItemsContainer.appendChild(cartCard);
+    }
+
+    private createCartCard(cartItem: { id: string, img: string, name: string, flavour: string, price: string }): HTMLDivElement {
+        const cartCard = document.createElement('div');
+        cartCard.classList.add('cart-card');
+
+        const img = document.createElement('img');
+        img.src = cartItem.img;
+        cartCard.appendChild(img);
+
+        const namePara = document.createElement('p');
+        namePara.textContent = cartItem.name;
+        cartCard.appendChild(namePara);
+
+        const flavourPara = document.createElement('p');
+        flavourPara.textContent = cartItem.flavour;
+        cartCard.appendChild(flavourPara);
+
+        const pricePara = document.createElement('p');
+        pricePara.textContent = `Ksh.${cartItem.price}`;
+        cartCard.appendChild(pricePara);
+
+        const removeButton = document.createElement('button');
+        removeButton.textContent = 'Remove';
+        removeButton.addEventListener('click', () => this.removeFromCart(cartCard));
+        cartCard.appendChild(removeButton);
+
+        return cartCard;
+    }
+
+    private async removeFromCart(cartCard: HTMLDivElement): Promise<void> {
+        const id = cartCard.dataset.id!;
+        // Implement removal from the cart API endpoint
+        // Remove the card from the cart card holder
+        cartCard.remove();
     }
 
     private async saveProductToAPI(product: { snackName: string, flavour: string, price: string, imageUrl: string }): Promise<{ id: string }> {
@@ -192,8 +255,7 @@ class SnackCentre {
             },
             body: JSON.stringify(product),
         });
-
-        return await response.json();
+        return response.json();
     }
 
     private async updateProductInAPI(id: string, product: { snackName: string, flavour: string, price: string, imageUrl: string }): Promise<void> {
@@ -215,43 +277,56 @@ class SnackCentre {
     private async loadProductsFromAPI(): Promise<void> {
         const response = await fetch('http://localhost:3000/products');
         const products = await response.json();
-        this.allProducts = products;
-
+        this.productsList.innerHTML = '';
         products.forEach((product: { id: string, snackName: string, flavour: string, price: string, imageUrl: string }) => {
             const snackCard = this.createCard(product.id, product.snackName, product.flavour, product.price, product.imageUrl);
             this.productsList.appendChild(snackCard);
+            this.allProducts.push(product);
         });
-
         this.updateViewOneSelect();
     }
 
     private updateViewOneSelect(): void {
-        this.viewOneSelect.innerHTML = '<option value="">View All</option>';
-        this.allProducts.forEach(product => {
+        const uniqueSnackNames = Array.from(new Set(this.allProducts.map(product => product.snackName)));
+        this.viewOneSelect.innerHTML = '<option value="">--Select Snack Name--</option>';
+        uniqueSnackNames.forEach(snackName => {
             const option = document.createElement('option');
-            option.value = product.snackName;
-            option.textContent = product.snackName;
+            option.value = snackName;
+            option.textContent = snackName;
             this.viewOneSelect.appendChild(option);
         });
     }
 
     private filterProducts(): void {
-        const selectedProductName = this.viewOneSelect.value;
-        const snackCards = this.productsList.querySelectorAll('.snack-card');
-    
-        snackCards.forEach(snackCard => {
-            const card = snackCard as HTMLDivElement;
-            const namePara = card.querySelector('p:nth-of-type(1)')!;
-            if (selectedProductName === '' || namePara.textContent === selectedProductName) {
-                card.style.display = 'block';
-            } else {
-                card.style.display = 'none';
-            }
-        });
+        const selectedSnackName = this.viewOneSelect.value;
+        if (selectedSnackName) {
+            const filteredProducts = this.allProducts.filter(product => product.snackName === selectedSnackName);
+            this.productsList.innerHTML = '';
+            filteredProducts.forEach(product => {
+                const snackCard = this.createCard(product.id, product.snackName, product.flavour, product.price, product.imageUrl);
+                this.productsList.appendChild(snackCard);
+            });
+        } else {
+            this.productsList.innerHTML = '';
+            this.allProducts.forEach(product => {
+                const snackCard = this.createCard(product.id, product.snackName, product.flavour, product.price, product.imageUrl);
+                this.productsList.appendChild(snackCard);
+            });
+        }
     }
-    
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     new SnackCentre();
+
+    const cartIcon = document.querySelector('.navigation ion-icon[name="cart-outline"]') as HTMLElement;
+    const mainDashboardButton = document.getElementById('main-dashboard-button') as HTMLButtonElement;
+
+    cartIcon.addEventListener('click', () => {
+        window.location.href = 'cart.html';
+    });
+
+    mainDashboardButton.addEventListener('click', () => {
+        window.location.href = 'index.html';
+    });
 });
